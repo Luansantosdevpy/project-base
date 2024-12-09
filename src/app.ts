@@ -6,8 +6,7 @@ import { Server } from 'http';
 import dependencyContainer from './dependencyContainer';
 import Logger from './infrastructure/log/logger';
 import routes from './api/routes/routes';
-import dbConfig from './infrastructure/data/config/database';
-import mongoose from 'mongoose';
+import { initializeDatabase } from './infrastructure/data/config/database';
 
 export default class App {
   public express: express.Application = express();
@@ -40,12 +39,11 @@ export default class App {
   }
 
   private async connectToMongoDB(): Promise<void> {
-    const { uri, options } = dbConfig;
     try {
-      await mongoose.connect(uri, options);
-      Logger.info('Connected to MongoDB');
+      await initializeDatabase();
+      Logger.info('MongoDB connection established');
     } catch (error) {
-      Logger.error('Error connecting to MongoDB:', error);
+      Logger.error('Error during MongoDB connection:', error);
       throw error;
     }
   }
