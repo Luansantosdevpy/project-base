@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
-import HealthCheckRepositoryInterface from '../../domain/interfaces/repositories/healthCheckRepositoryInterface';
+
+import type HealthCheckRepositoryInterface from '../../domain/interfaces/repositories/healthCheckRepositoryInterface';
 import Logger from '../../infrastructure/log/logger';
 
 @injectable()

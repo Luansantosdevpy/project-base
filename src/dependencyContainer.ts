@@ -1,8 +1,9 @@
-import { DependencyContainer } from 'tsyringe';
-import Logger from './infrastructure/log/logger';
-import HealthCheckRepositoryInterface from './domain/interfaces/repositories/healthCheckRepositoryInterface';
-import HealthCheckRepository from './infrastructure/data/repositories/healthCheckRepository';
+import type { DependencyContainer } from 'tsyringe';
+
 import HealthCheckService from './application/services/healthCheckService';
+import type HealthCheckRepositoryInterface from './domain/interfaces/repositories/healthCheckRepositoryInterface';
+import HealthCheckRepository from './infrastructure/data/repositories/healthCheckRepository';
+import Logger from './infrastructure/log/logger';
 
 export default async (container: DependencyContainer): Promise<void> => {
   Logger.debug('Dependency container initializing...');

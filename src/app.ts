@@ -1,12 +1,14 @@
 import 'reflect-metadata';
 import cors from 'cors';
-import express, { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
+import express from 'express';
+import type { Server } from 'http';
 import { container } from 'tsyringe';
-import { Server } from 'http';
-import dependencyContainer from './dependencyContainer';
-import Logger from './infrastructure/log/logger';
+
 import routes from './api/routes/routes';
+import dependencyContainer from './dependencyContainer';
 import { initializeDatabase } from './infrastructure/data/config/database';
+import Logger from './infrastructure/log/logger';
 
 export default class App {
   public express: express.Application = express();
@@ -69,7 +71,7 @@ export default class App {
   }
 
   private setupErrorHandling(): void {
-    this.express.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    this.express.use((err: Error, req: Request, res: Response) => {
       Logger.error('Unhandled error:', err);
       res.status(500).json({ error: 'Internal Server Error' });
     });

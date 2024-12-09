@@ -1,6 +1,7 @@
-import { injectable } from 'tsyringe';
 import mongoose from 'mongoose';
-import HealthCheckRepositoryInterface from '../../../domain/interfaces/repositories/healthCheckRepositoryInterface';
+import { injectable } from 'tsyringe';
+
+import type HealthCheckRepositoryInterface from '../../../domain/interfaces/repositories/healthCheckRepositoryInterface';
 import Logger from '../../log/logger';
 
 @injectable()

@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
+
 import App from './app';
 import Logger from './infrastructure/log/logger';
 

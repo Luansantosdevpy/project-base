@@ -1,4 +1,5 @@
-import winston from 'winston';
+import type winston from 'winston';
+
 import { levels } from './loggerConfig';
 
 export const consoleMessageFormatter = (info: winston.LogEntry): string => {

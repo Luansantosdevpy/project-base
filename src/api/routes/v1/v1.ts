@@ -1,4 +1,5 @@
 import { Router } from 'express';
+
 import healthcheck from './healthcheck';
 
 export default async (): Promise<Router> => {

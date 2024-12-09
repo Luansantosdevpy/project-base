@@ -1,5 +1,6 @@
+import type { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { Request, Response } from 'express';
+
 import HealthCheckService from '../../application/services/healthCheckService';
 import Logger from '../../infrastructure/log/logger';
 
