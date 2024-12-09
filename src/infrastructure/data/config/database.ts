@@ -1,4 +1,6 @@
-import dotenv, { config } from 'dotenv';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import Logger from '../../log/logger';
 
 dotenv.config();
 
@@ -9,7 +11,17 @@ const dbConfig = {
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
-    family: 4
+    family: 4,
+  },
+};
+
+export const initializeDatabase = async (): Promise<void> => {
+  try {
+    await mongoose.connect(dbConfig.uri, dbConfig.options);
+    Logger.debug('Connected to MongoDB');
+  } catch (error) {
+    Logger.error('Error connecting to MongoDB:', error);
+    throw error;
   }
 };
 
