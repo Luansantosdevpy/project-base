@@ -10,24 +10,30 @@ export default class HealthCheckService {
   ) {}
 
   public async checkStatusAPI() {
-    Logger.debug(
-      'healthCheckService - checkStatusAPI - mongoHealthCheckRepository'
-    );
-    const mongoCheck = await this.mongoHealthCheckRepository.findStatus();
+    Logger.debug('HealthCheckService - checkStatusAPI - Begin health checks');
+
+    let mongoCheck = 'OK';
+    try {
+      mongoCheck = await this.mongoHealthCheckRepository.findStatus();
+    } catch (error) {
+      Logger.error('HealthCheckService - MongoDB check failed:', error);
+      mongoCheck = 'ERROR';
+    }
 
     const healthcheck = {
-      name: 'Sales Master',
-      status: 'OK',
+      name: 'Project base',
+      status: mongoCheck === 'OK' ? 'OK' : 'ERROR',
       uptime: process.uptime(),
       timestamp: Date.now(),
       checks: [
         {
           name: 'Database',
-          status: mongoCheck
-        }
-      ]
+          status: mongoCheck,
+        },
+      ],
     };
 
+    Logger.debug('HealthCheckService - checkStatusAPI - Completed health checks');
     return healthcheck;
   }
 }
