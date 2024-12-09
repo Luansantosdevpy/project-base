@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import cors from 'cors';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { container } from 'tsyringe';
 import { Server } from 'http';
 import dependencyContainer from './dependencyContainer';
@@ -14,51 +14,66 @@ export default class App {
 
   private server: Server;
 
-  public initialize = async (): Promise<void> => {
-    await this.connectToMongoDB();
-    await this.dependencyContainer();
-    await this.middlewares();
-    await this.routes();
-  };
+  public async initialize(): Promise<void> {
+    try {
+      await this.connectToMongoDB();
+      await this.setupDependencyInjection();
+      this.setupMiddlewares();
+      await this.setupRoutes();
+      this.setupErrorHandling();
+    } catch (error) {
+      Logger.error('Error during app initialization:', error);
+      process.exit(1);
+    }
+  }
 
-  public start = (port: number, appName: string): void => {
+  public start(port: number, appName: string): void {
     this.server = this.express.listen(port, '0.0.0.0', () => {
       Logger.info(`${appName} listening on port ${port}!`);
     });
-  };
+  }
 
-  public stop = (): void => {
-    this.server.close();
-  };
+  public stop(): void {
+    this.server.close(() => {
+      Logger.info('Server stopped gracefully.');
+    });
+  }
 
-  private middlewares = async (): Promise<void> => {
+  private async connectToMongoDB(): Promise<void> {
+    const { uri, options } = dbConfig;
+    try {
+      await mongoose.connect(uri, options);
+      Logger.info('Connected to MongoDB');
+    } catch (error) {
+      Logger.error('Error connecting to MongoDB:', error);
+      throw error;
+    }
+  }
+
+  private async setupDependencyInjection(): Promise<void> {
+    await dependencyContainer(container);
+  }
+
+  private setupMiddlewares(): void {
     this.express.use(express.json());
     this.express.use(
       cors({
         origin: '*',
         methods: 'POST, GET, PUT, OPTIONS, PATCH, DELETE',
-        exposedHeaders: 'X-file-name'
+        exposedHeaders: 'X-file-name',
       })
     );
-    this.express.use(cors());
-  };
-
-  private async connectToMongoDB(): Promise<void> {
-    try {
-      const { uri, options } = dbConfig;
-      await mongoose.connect(uri, options);
-      Logger.info('Connected to MongoDB');
-    } catch (error) {
-      Logger.error('Error connecting to MongoDB:', error);
-      process.exit(1);
-    }
   }
 
-  private dependencyContainer = async (): Promise<void> => {
-    await dependencyContainer(container);
-  };
+  private async setupRoutes(): Promise<void> {
+    const router = await routes();
+    this.express.use(router);
+  }
 
-  private routes = async (): Promise<void> => {
-    this.express.use(await routes());
-  };
+  private setupErrorHandling(): void {
+    this.express.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+      Logger.error('Unhandled error:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
+  }
 }
